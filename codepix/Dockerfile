@@ -1,6 +1,8 @@
-FROM golang:1.16
+FROM golang:1.19
 
 WORKDIR /go/src
+COPY go.mod go.sum ./
+RUN go mod download
 ENV PATH="/go/bin:${PATH}"
 ENV GO111MODULE=on
 ENV CGO_ENABLED=1

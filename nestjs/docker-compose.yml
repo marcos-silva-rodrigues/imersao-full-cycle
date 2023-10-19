@@ -11,3 +11,4 @@ services:
     image: postgres:13-alpine
     environment:
       POSTGRES_PASSWORD: root
+      POSTGRES_DB: nest

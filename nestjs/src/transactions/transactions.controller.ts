@@ -15,7 +15,7 @@ export class TransactionsController {
   }
 
   @Get()
-  findAll() {
-    return this.transactionsService.findAll();
+  findAll(@Param('bankAccountId') bankAccountId: string) {
+    return this.transactionsService.findAll(bankAccountId);
   }
 }

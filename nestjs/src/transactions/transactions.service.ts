@@ -1,26 +1,55 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import { DataSource, Repository } from 'typeorm';
+import {
+  Transaction,
+  TransactionOperation,
+} from './entities/transaction.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { BankAccount } from 'src/bank-accounts/entities/bank-account.entity';
 
 @Injectable()
 export class TransactionsService {
-  create(createTransactionDto: CreateTransactionDto) {
-    return 'This action adds a new transaction';
+  constructor(
+    @InjectRepository(Transaction)
+    private transactionRepo: Repository<Transaction>,
+
+    @InjectRepository(BankAccount)
+    private bankAccountRepo: Repository<BankAccount>,
+
+    private dataSource: DataSource,
+  ) {}
+
+  async create(
+    bankAccountId: string,
+    createTransactionDto: CreateTransactionDto,
+  ) {
+    return await this.dataSource.transaction(async (manager) => {
+      const bankAccount = await manager.findOneOrFail(BankAccount, {
+        where: {
+          id: bankAccountId,
+        },
+        lock: {
+          mode: 'pessimistic_write',
+        },
+      });
+
+      const transaction = manager.create(Transaction, {
+        ...createTransactionDto,
+        amount: createTransactionDto.amount * -1,
+        bank_account_id: bankAccountId,
+        operation: TransactionOperation.debit,
+      });
+
+      await manager.save(transaction);
+
+      bankAccount.balance += transaction.amount;
+      await manager.save(bankAccount);
+      return transaction;
+    });
   }
 
   findAll() {
     return `This action returns all transactions`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} transaction`;
-  }
-
-  update(id: number, updateTransactionDto: UpdateTransactionDto) {
-    return `This action updates a #${id} transaction`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} transaction`;
   }
 }

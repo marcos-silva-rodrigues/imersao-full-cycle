@@ -40,7 +40,7 @@ func (p *PixGrpcService) Find(ctx context.Context, in *pb.PixKey) (*pb.PixKeyInf
 		Account: &pb.Account{
 			AccountId:     pixKey.AccountID,
 			AccountNumber: pixKey.Account.Number,
-			BankId:        pixKey.Account.BankId,
+			BankId:        pixKey.Account.BankID,
 			BankName:      pixKey.Account.Bank.Name,
 			OwnerName:     pixKey.Account.OwnerName,
 			CreatedAt:     pixKey.Account.CreatedAt.String(),

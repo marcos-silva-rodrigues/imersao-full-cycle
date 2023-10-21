@@ -5,9 +5,23 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Transaction } from './entities/transaction.entity';
 import { BankAccount } from 'src/bank-accounts/entities/bank-account.entity';
 import { PixKey } from 'src/pix-keys/entities/pix-key.entity';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Transaction, BankAccount, PixKey])],
+  imports: [
+    ClientsModule.register([
+      {
+        name: 'KAFKA_SERVICE',
+        transport: Transport.KAFKA,
+        options: {
+          client: {
+            brokers: ['host.docker.internal:9094'],
+          },
+        },
+      },
+    ]),
+    TypeOrmModule.forFeature([Transaction, BankAccount, PixKey]),
+  ],
   controllers: [TransactionsController],
   providers: [TransactionsService],
 })

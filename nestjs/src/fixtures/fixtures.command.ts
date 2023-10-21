@@ -1,10 +1,9 @@
 import { Console, Command } from 'nestjs-console';
 import { DataSource } from 'typeorm';
-import * as chalk from 'chalk';
 
 @Console()
 export class FixturesCommand {
-  constructor(private dataSource: DataSource) { }
+  constructor(private dataSource: DataSource) {}
 
   @Command({
     command: 'fixtures',
@@ -17,7 +16,7 @@ export class FixturesCommand {
       await this.createInDatabase(fixture.model, fixture.fields);
     }
 
-    console.log(chalk.green('Data generated'));
+    console.log('Data generated');
   }
 
   async clearTables() {
